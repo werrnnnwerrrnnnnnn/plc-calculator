@@ -68,6 +68,101 @@ class MyParser(Parser):
     def expr(self, p):
         return int(p.NUMBER)
 
+    def parse(self, tokens):
+        # isTokenPrefix = self.is_prefix(tokens)
+        return super().parse(tokens)
+
+class PrefixParser(Parser):
+    debugfile = 'parser.out'
+    start = 'statement'
+    tokens = MyLexer.tokens
+    precedence = (
+        ('left', "+", MINUS),
+        ('left', TIMES, DIVIDE),
+        ('right', UMINUS),
+    )
+
+    def __init__(self, output_widget=None):
+        self.memory = Memory()
+        self.infix_stack = []  # stack to build infix expr
+
+    def get_infix(self):
+        return self.infix_stack[0] if self.infix_stack else ""
+
+    @_('NAME ASSIGN expr')
+    def statement(self, p):
+        var_name = p.NAME
+        value = p.expr
+        self.memory.set(variable_name=var_name, value=value, data_type=type(value))
+        self.infix_stack = [f"{var_name} = {self.infix_stack[0]}"]  # Update infix with assignment
+
+    @_('expr')
+    def statement(self, p) -> int:
+        result = p.expr
+        return result
+
+    @_('"+" expr expr')
+    def expr(self, p):
+        result = p.expr0 + p.expr1
+        # Pop two infix sub-expressions and combine them
+        right = self.infix_stack.pop()
+        left = self.infix_stack.pop()
+
+        self.infix_stack.append(f"({left} + {right})")
+        return result
+
+    @_('MINUS expr expr')
+    def expr(self, p):
+        result = p.expr0 - p.expr1
+
+        right = self.infix_stack.pop()
+        left = self.infix_stack.pop()
+
+        self.infix_stack.append(f"({left} - {right})")
+        return result
+
+    @_('TIMES expr expr')
+    def expr(self, p):
+        result = p.expr0 * p.expr1
+
+        right = self.infix_stack.pop()
+        left = self.infix_stack.pop()
+
+        self.infix_stack.append(f"({left} * {right})")
+        return result
+
+    @_('DIVIDE expr expr')
+    def expr(self, p):
+        result = p.expr0 / p.expr1
+
+        right = self.infix_stack.pop()
+        left = self.infix_stack.pop()
+        
+        self.infix_stack.append(f"({left} / {right})")
+        return result
+
+    @_('MINUS expr %prec UMINUS')
+    def expr(self, p):
+        result = -p.expr
+
+        expr = self.infix_stack.pop()
+
+        self.infix_stack.append(f"-{expr}")
+        return result
+
+    @_('LPAREN expr RPAREN')
+    def expr(self, p):
+        return p.expr
+
+    @_('NUMBER')
+    def expr(self, p):
+        num = int(p.NUMBER)
+        self.infix_stack.append(str(num))
+        return num
+
+    def parse(self, tokens):
+        self.infix_stack = []  # reset
+        return super().parse(tokens)
 
 from components.ast.statement import Expression, Expression_math, Expression_number, Operations
 class ASTParser(Parser):
