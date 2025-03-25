@@ -97,11 +97,13 @@ class PrefixParser(Parser):
         self.infix_stack = [f"{var_name} = {self.infix_stack[0]}"]  # Update infix with assignment
 
     @_('expr')
+    # S -> E
     def statement(self, p) -> int:
         result = p.expr
         return result
 
     @_('"+" expr expr')
+    # E -> + E E
     def expr(self, p):
         result = p.expr0 + p.expr1
         # Pop two infix sub-expressions and combine them
@@ -112,6 +114,7 @@ class PrefixParser(Parser):
         return result
 
     @_('MINUS expr expr')
+    # E -> - E E
     def expr(self, p):
         result = p.expr0 - p.expr1
 
@@ -122,6 +125,7 @@ class PrefixParser(Parser):
         return result
 
     @_('TIMES expr expr')
+    # E -> * E E
     def expr(self, p):
         result = p.expr0 * p.expr1
 
@@ -132,6 +136,7 @@ class PrefixParser(Parser):
         return result
 
     @_('DIVIDE expr expr')
+    # E -> / E E
     def expr(self, p):
         result = p.expr0 / p.expr1
 
@@ -142,6 +147,7 @@ class PrefixParser(Parser):
         return result
 
     @_('MINUS expr %prec UMINUS')
+    # E -> -E
     def expr(self, p):
         result = -p.expr
 
@@ -151,10 +157,12 @@ class PrefixParser(Parser):
         return result
 
     @_('LPAREN expr RPAREN')
+    # E -> ( E )
     def expr(self, p):
         return p.expr
 
     @_('NUMBER')
+    # E -> number
     def expr(self, p):
         num = int(p.NUMBER)
         self.infix_stack.append(str(num))
