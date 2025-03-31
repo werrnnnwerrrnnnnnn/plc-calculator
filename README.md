@@ -2,6 +2,13 @@
 - **By : Tatiya Seehatrakul st124875**
 - This project is developed to fulfill the requirements of the AT70.07 Programming Languages and Compilers course at the Asian Institute of Technology (AIT) for the January 2025 semester.
 
+---
+### 📍 Project Overview
+
+A simple **Prefix Expression Calculator** built with **PyQt6**, using **Qt Designer** for the GUI layout and **SLY** for parsing.  
+It supports **addition**, **multiplication**, and **positive/negative integers**, converting prefix input to infix and displaying the result.  
+The interface features a clean layout with color-coded buttons and hover effects for a smooth user experience.
+
 <p align="left">
   <img src="demo.gif" width="453" height="640">
 </p>
