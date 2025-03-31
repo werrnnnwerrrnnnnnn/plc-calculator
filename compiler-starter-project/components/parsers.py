@@ -2,76 +2,6 @@ from components.lexica import MyLexer
 from components.memory import Memory
 from sly import Parser
 
-class MyParser(Parser):
-    debugfile = 'parser.out'
-    start = 'statement'
-    # Get the token list from the lexer (required)
-    tokens = MyLexer.tokens
-    precedence = (
-        ('left', "+", MINUS),
-        ('left', TIMES, DIVIDE),
-        ('right', UMINUS),
-        )
-
-    def __init__(self):
-        self.memory:Memory = Memory()
-
-    @_('NAME ASSIGN expr')
-    def statement(self, p):
-        var_name = p.NAME
-        value = p.expr
-        self.memory.set(variable_name=var_name,value=value, data_type=type(value))
-        # Note that I did not return anything
-
-    @_('expr')
-    # S -> E
-    def statement(self, p) -> int:
-        return p.expr
-
-    # The example with literals
-    @_('expr "+" expr')
-    # E -> E + E
-    def expr(self, p):
-        # You can refer to the token 2 ways
-        # Way1: using array
-        print(p[0], p[1], p[2])
-        # Way2: using symbol name. 
-        # Here, if you have more than one symbols with the same name
-        # You have to indiciate the number at the end.
-        return p.expr0 + p.expr1
-
-    # The example with normal token
-    @_('expr MINUS expr')
-    def expr(self, p):
-        print(p[0], p[1], p[2])
-        return p.expr0 - p.expr1
-
-    @_('expr TIMES expr')
-    def expr(self, p):
-        return p.expr0 * p.expr1
-
-    @_('expr DIVIDE expr')
-    def expr(self, p):
-        return p.expr0 / p.expr1
-
-    # https://sly.readthedocs.io/en/latest/sly.html#dealing-with-ambiguous-grammars
-    # `%prec UMINUS` is the way to override the `precedence` of MINUS to UMINUS.
-    @_('MINUS expr %prec UMINUS')
-    def expr(self, p):
-        return -p.expr
-
-    @_('LPAREN expr RPAREN')
-    def expr(self, p):
-        return p.expr
-
-    @_('NUMBER')
-    def expr(self, p):
-        return int(p.NUMBER)
-
-    def parse(self, tokens):
-        # isTokenPrefix = self.is_prefix(tokens)
-        return super().parse(tokens)
-
 class PrefixParser(Parser):
     debugfile = 'parser.out'
     start = 'statement'
@@ -79,7 +9,6 @@ class PrefixParser(Parser):
     precedence = (
         ('left', "+", MINUS),
         ('left', TIMES, DIVIDE),
-        ('right', UMINUS),
     )
 
     def __init__(self, output_widget=None):
@@ -95,15 +24,15 @@ class PrefixParser(Parser):
         value = p.expr
         self.memory.set(variable_name=var_name, value=value, data_type=type(value))
         self.infix_stack = [f"{var_name} = {self.infix_stack[0]}"]  # Update infix with assignment
-
-    @_('expr')
+    
     # S -> E
+    @_('expr')
     def statement(self, p) -> int:
         result = p.expr
         return result
 
-    @_('"+" expr expr')
     # E -> + E E
+    @_('"+" expr expr')
     def expr(self, p):
         result = p.expr0 + p.expr1
         # Pop two infix sub-expressions and combine them
@@ -113,19 +42,8 @@ class PrefixParser(Parser):
         self.infix_stack.append(f"({left} + {right})")
         return result
 
-    @_('MINUS expr expr')
-    # E -> - E E
-    def expr(self, p):
-        result = p.expr0 - p.expr1
-
-        right = self.infix_stack.pop()
-        left = self.infix_stack.pop()
-
-        self.infix_stack.append(f"({left} - {right})")
-        return result
-
-    @_('TIMES expr expr')
     # E -> * E E
+    @_('TIMES expr expr')
     def expr(self, p):
         result = p.expr0 * p.expr1
 
@@ -135,34 +53,8 @@ class PrefixParser(Parser):
         self.infix_stack.append(f"({left} * {right})")
         return result
 
-    @_('DIVIDE expr expr')
-    # E -> / E E
-    def expr(self, p):
-        result = p.expr0 / p.expr1
-
-        right = self.infix_stack.pop()
-        left = self.infix_stack.pop()
-        
-        self.infix_stack.append(f"({left} / {right})")
-        return result
-
-    @_('MINUS expr %prec UMINUS')
-    # E -> -E
-    def expr(self, p):
-        result = -p.expr
-
-        expr = self.infix_stack.pop()
-
-        self.infix_stack.append(f"-{expr}")
-        return result
-
-    @_('LPAREN expr RPAREN')
-    # E -> ( E )
-    def expr(self, p):
-        return p.expr
-
-    @_('NUMBER')
     # E -> number
+    @_('NUMBER')
     def expr(self, p):
         num = int(p.NUMBER)
         self.infix_stack.append(str(num))
@@ -206,9 +98,6 @@ class ASTParser(Parser):
     @_('NUMBER')
     def expr(self, p) -> Expression:
         return Expression_number(number=p.NUMBER)
-        
-        
-
         
 if __name__ == "__main__":
     lexer = MyLexer()
