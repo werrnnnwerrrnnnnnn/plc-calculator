@@ -5,9 +5,7 @@
 ---
 ### 📍 Project Overview
 
-A simple **Prefix Expression Calculator** built with **PyQt6**, using **Qt Designer** for the GUI layout and **SLY** for parsing.  
-It supports **addition**, **multiplication**, and **positive/negative integers**, converting prefix input to infix and displaying the result.  
-The interface features a clean layout with color-coded buttons and hover effects for a smooth user experience.
+A simple **Prefix Expression Calculator** built with **PyQt6**, using **Qt Designer** for the GUI layout and **SLY** for parsing.  It supports **addition**, **multiplication**, and **positive/negative integers**, converting prefix input to infix and displaying the result. The interface features a clean layout with color-coded buttons and hover effects for a smooth user experience.
 
 <p align="left">
   <img src="demo.gif" width="453" height="640">
@@ -42,3 +40,66 @@ After the project is cloned and all setup steps are completed, the project can b
 - To launch `Qt Designer` run:
     - `pdm shell pyqt6-tools designer`
     - `pdm run ui` or `pyqt6-tools designer main.ui`
+
+---
+### 📍 Project Exam
+
+### Question 1 : Change the symbol `*` to `^` for multiplication
+
+- #### EX1  
+  **Input:**  
+  ```
+  ^ 4 5
+  ```
+
+  **Output:**  
+  ```
+  20
+  ```
+
+- #### EX2  
+  **Input:**  
+  ```
+  ^ 1 10
+  ```
+
+  **Output:**  
+  ```
+  10
+  ```
+
+---
+
+### Question 2 : Implement a new arithmetic feature using `%`, it will perform modulation.
+
+- #### EX1  
+  **Input:**  
+  ```
+  % 10 3
+  ```
+
+  **Output:**  
+  ```
+  10 % 3
+  ```
+
+  **Result:**  
+  ```
+  1
+  ```
+
+- #### EX2  
+  **Input:**  
+  ```
+  % 9 7
+  ```
+
+  **Output:**  
+  ```
+  9 % 7
+  ```
+
+  **Result:**  
+  ```
+  2
+  ```
