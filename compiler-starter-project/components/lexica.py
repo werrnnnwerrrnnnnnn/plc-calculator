@@ -42,7 +42,7 @@ class MyLexer(Lexer):
     ASSIGN  = r'\='
     # PLUS    = r'\+'
     MINUS   = r'-'
-    TIMES   = r'\*'
+    TIMES   = r'\^'
     DIVIDE  = r'/'
     LPAREN  = r'\('
     RPAREN  = r'\)'
