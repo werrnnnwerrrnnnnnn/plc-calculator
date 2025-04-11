@@ -8,7 +8,7 @@ class PrefixParser(Parser):
     tokens = MyLexer.tokens
     precedence = (
         ('left', "+", MINUS),
-        ('left', TIMES, DIVIDE),
+        ('left', TIMES, DIVIDE, MOD),
     )
 
     def __init__(self, output_widget=None):
@@ -34,6 +34,7 @@ class PrefixParser(Parser):
     # E -> + E E
     @_('"+" expr expr')
     def expr(self, p):
+        print("PLUS+++++", p)
         result = p.expr0 + p.expr1
         # Pop two infix sub-expressions and combine them
         right = self.infix_stack.pop()
@@ -45,6 +46,7 @@ class PrefixParser(Parser):
     # E -> * E E
     @_('TIMES expr expr')
     def expr(self, p):
+        print("TIMES*****", p)
         result = p.expr0 * p.expr1
 
         right = self.infix_stack.pop()
@@ -52,10 +54,23 @@ class PrefixParser(Parser):
 
         self.infix_stack.append(f"({left} * {right})")
         return result
+    
+    # E -> % E E
+    @_('MOD expr expr')
+    def expr(self, p):
+        print("MOD%%%%%%", p)
+        result = p.expr0 % p.expr1
+
+        right = self.infix_stack.pop()
+        left = self.infix_stack.pop()
+
+        self.infix_stack.append(f"({left} % {right})")
+        return result
 
     # E -> number
     @_('NUMBER')
     def expr(self, p):
+        print("NUMBER====", p)
         num = int(p.NUMBER)
         self.infix_stack.append(str(num))
         return num
